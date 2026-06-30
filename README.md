@@ -2,7 +2,7 @@
 
 Europe-focused heat-zone PWA for recent safety-awareness checks by country or city.
 
-![EU - Heat Zones](apps/web/public/euhz.png)
+<p align="center"><img src="apps/web/public/euhz.png" alt="EU - Heat Zones" style="max-height: 40vh" /></p>
 
 The repo is a small monorepo:
 

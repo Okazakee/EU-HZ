@@ -311,7 +311,7 @@ func hexPolygon(centerLng, centerLat, radiusKm float64) []point {
 
 func buildHeatAggregates(incidents []normalizedIncident, now time.Time) map[string]aggregateCell {
 	result := map[string]aggregateCell{}
-	window := 180 * 24 * time.Hour
+	window := 5 * 365 * 24 * time.Hour
 
 	for _, incident := range incidents {
 		if incident.OccurredAt.Before(now.Add(-window)) {

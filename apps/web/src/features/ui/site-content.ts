@@ -7,6 +7,13 @@ export const appDescription =
 
 export const appTagline = "Recent travel awareness across Europe.";
 
+export const ogImage = {
+  url: "/opengraph.png",
+  width: 1731,
+  height: 909,
+  alt: appName,
+};
+
 export const onboardingPoints = [
   "Search a whole country like Italy or move straight to a city like Bruxelles before a trip.",
   "Read the visible heat zones as recent signals for the area you are checking, from Europe-wide down to city view.",

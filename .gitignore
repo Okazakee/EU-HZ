@@ -22,7 +22,9 @@ Thumbs.db
 *.swp
 *.swo
 *~
-.opencode/
+.opencode/*
+!.opencode/opencode.json
+!.opencode/skills/
 
 # TypeScript build artifacts
 *.tsbuildinfo

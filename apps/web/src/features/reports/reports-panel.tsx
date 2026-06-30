@@ -172,7 +172,7 @@ function ReportCard({ report, onOpen }: { report: ReportItem; onOpen: () => void
           <div className="truncate text-sm text-slate-200">{report.locationLabel}</div>
         </div>
         <div className="mt-1 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-slate-400 md:mt-3">
-          <span>{new Date(report.occurredAt).toLocaleDateString()}</span>
+          <span>{new Date(report.occurredAt).toLocaleDateString("en-GB")}</span>
         </div>
       </div>
       <Eyebrow className="absolute top-3 right-3 z-10 text-slate-400">{report.eventType}</Eyebrow>

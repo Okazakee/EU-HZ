@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
-import { appDescription, appName } from "@/features/ui/site-content";
+import { appDescription, appName, ogImage } from "@/features/ui/site-content";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://euhz.vercel.app"),
   title: appName,
   description: appDescription,
   applicationName: appName,
@@ -22,11 +23,15 @@ export const metadata: Metadata = {
     title: appName,
     description: appDescription,
     type: "website",
+    url: "/",
+    siteName: appName,
+    images: [ogImage],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: appName,
     description: appDescription,
+    images: [ogImage],
   },
   icons: {
     icon: "/favicon-32x32.png",

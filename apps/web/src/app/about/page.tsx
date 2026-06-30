@@ -2,11 +2,22 @@ import type { Metadata } from "next";
 
 import { SurfaceCard } from "@/features/ui/atoms";
 import { InfoPageShell } from "@/features/ui/info-page-shell";
-import { appVersion } from "@/features/ui/site-content";
+import { appVersion, ogImage } from "@/features/ui/site-content";
 
 export const metadata: Metadata = {
   title: "About | EU - Heat Zones",
   description: "About the EU - Heat Zones project and its current product scope.",
+  openGraph: {
+    title: "About | EU - Heat Zones",
+    description: "About the EU - Heat Zones project and its current product scope.",
+    images: [ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About | EU - Heat Zones",
+    description: "About the EU - Heat Zones project and its current product scope.",
+    images: [ogImage],
+  },
 };
 
 export default function AboutPage() {
@@ -26,7 +37,7 @@ export default function AboutPage() {
       <SurfaceCard className="space-y-3">
         <h2 className="text-lg font-semibold text-slate-50">Current scope</h2>
         <p className="text-sm leading-7 text-slate-300">
-          The map covers all 27 EU member states through national news outlets monitored on X. Each report is classified into one of four event types — harassment, robbery, assault, or violence — and placed onto a city-level heat zone over a rolling 180-day window. The frontend is intentionally account-free; the backend keeps storage lean with a manual cleanup mode that removes incidents older than 30 days.
+          The map covers all 27 EU member states through national news outlets monitored on X. Each report is classified into one of four event types — harassment, robbery, assault, or violence — and placed onto a city-level heat zone over a rolling 5-year window. The frontend is intentionally account-free; the backend retains up to 5 years of incident data.
         </p>
       </SurfaceCard>
 

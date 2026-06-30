@@ -40,7 +40,7 @@ export function IncidentModal({ publicId, open, onClose }: IncidentModalProps) {
           </div>
 
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-400">
-            <span>{new Date(incident.occurredAt).toLocaleDateString(undefined, {
+            <span>{new Date(incident.occurredAt).toLocaleDateString("en-GB", {
               weekday: "short",
               year: "numeric",
               month: "short",
@@ -71,7 +71,7 @@ export function IncidentModal({ publicId, open, onClose }: IncidentModalProps) {
                     {item.title}
                   </div>
                   <div className="mt-1 text-xs text-slate-600">
-                    {new Date(item.publishedAt).toLocaleDateString()}
+                    {new Date(item.publishedAt).toLocaleDateString("en-GB")}
                   </div>
                   <div className="mt-3">
                     <PrimaryButton href={item.url}>View Source</PrimaryButton>

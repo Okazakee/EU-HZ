@@ -2,10 +2,22 @@ import type { Metadata } from "next";
 
 import { SurfaceCard } from "@/features/ui/atoms";
 import { InfoPageShell } from "@/features/ui/info-page-shell";
+import { ogImage } from "@/features/ui/site-content";
 
 export const metadata: Metadata = {
   title: "How This Works | EU - Heat Zones",
   description: "How EU - Heat Zones turns recent reports into travel-awareness map zones.",
+  openGraph: {
+    title: "How This Works | EU - Heat Zones",
+    description: "How EU - Heat Zones turns recent reports into travel-awareness map zones.",
+    images: [ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "How This Works | EU - Heat Zones",
+    description: "How EU - Heat Zones turns recent reports into travel-awareness map zones.",
+    images: [ogImage],
+  },
 };
 
 export default function HowItWorksPage() {

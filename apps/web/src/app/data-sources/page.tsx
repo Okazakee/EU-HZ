@@ -2,10 +2,22 @@ import type { Metadata } from "next";
 
 import { Pill, SurfaceCard } from "@/features/ui/atoms";
 import { InfoPageShell } from "@/features/ui/info-page-shell";
+import { ogImage } from "@/features/ui/site-content";
 
 export const metadata: Metadata = {
   title: "Data Sources | EU - Heat Zones",
   description: "How source material is selected and transformed into EU - Heat Zones map signals.",
+  openGraph: {
+    title: "Data Sources | EU - Heat Zones",
+    description: "How source material is selected and transformed into EU - Heat Zones map signals.",
+    images: [ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Data Sources | EU - Heat Zones",
+    description: "How source material is selected and transformed into EU - Heat Zones map signals.",
+    images: [ogImage],
+  },
 };
 
 const sourceCountries = [
@@ -48,7 +60,7 @@ export default function DataSourcesPage() {
       <SurfaceCard className="space-y-3">
         <h2 className="text-lg font-semibold text-slate-50">Retention</h2>
         <p className="text-sm leading-7 text-slate-300">
-          The heat map reflects a rolling 180-day window of incidents. A manual cleanup mode removes stored incidents older than 30 days to keep storage bounded, but the aggregation window is wider so recent seasonal trends remain visible. The product is a travel-awareness snapshot, not a historical archive.
+          The heat map reflects a rolling 5-year window of incidents. A manual cleanup mode removes stored incidents older than 5 years to keep storage bounded. The product is a travel-awareness snapshot, not a short-term feed.
         </p>
       </SurfaceCard>
     </InfoPageShell>

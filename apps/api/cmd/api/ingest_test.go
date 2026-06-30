@@ -54,17 +54,17 @@ func TestDedupeIngestItemsKeepsCrossSourceCorroboration(t *testing.T) {
 	}
 }
 
-func TestBuildHeatAggregates180dWindow(t *testing.T) {
+func TestBuildHeatAggregates5yWindow(t *testing.T) {
 	now := time.Date(2026, 6, 30, 12, 0, 0, 0, time.UTC)
 	incidents := []normalizedIncident{
 		{LocationLabel: "Brussels", City: "Brussels", CountryCode: "BE", Confidence: 0.6, OccurredAt: now.Add(-2 * time.Hour)},
 		{LocationLabel: "Brussels", City: "Brussels", CountryCode: "BE", Confidence: 0.7, OccurredAt: now.Add(-25 * time.Hour)},
-		{LocationLabel: "Brussels", City: "Brussels", CountryCode: "BE", Confidence: 0.5, OccurredAt: now.Add(-200 * 24 * time.Hour)},
+		{LocationLabel: "Brussels", City: "Brussels", CountryCode: "BE", Confidence: 0.5, OccurredAt: now.Add(-6 * 365 * 24 * time.Hour)},
 	}
 
 	aggregates := buildHeatAggregates(incidents, now)
 	if aggregates["bru"].Count != 2 {
-		t.Fatalf("expected 2 Brussels incidents within 180d, got %d", aggregates["bru"].Count)
+		t.Fatalf("expected 2 Brussels incidents within 5y, got %d", aggregates["bru"].Count)
 	}
 	if aggregates["bru"].Score < 0.64 || aggregates["bru"].Score > 0.74 {
 		t.Fatalf("expected score ~0.69 (avg 0.65 + count bonus 0.08), got %f", aggregates["bru"].Score)

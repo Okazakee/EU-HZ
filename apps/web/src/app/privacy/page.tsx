@@ -2,10 +2,22 @@ import type { Metadata } from "next";
 
 import { SurfaceCard } from "@/features/ui/atoms";
 import { InfoPageShell } from "@/features/ui/info-page-shell";
+import { ogImage } from "@/features/ui/site-content";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | EU - Heat Zones",
   description: "Privacy information for EU - Heat Zones.",
+  openGraph: {
+    title: "Privacy Policy | EU - Heat Zones",
+    description: "Privacy information for EU - Heat Zones.",
+    images: [ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy | EU - Heat Zones",
+    description: "Privacy information for EU - Heat Zones.",
+    images: [ogImage],
+  },
 };
 
 export default function PrivacyPage() {

@@ -85,7 +85,7 @@ func (s *store) seed(ctx context.Context) error {
 }
 
 func (s *store) cleanup(ctx context.Context) error {
-	cutoff := time.Now().UTC().Add(-30 * 24 * time.Hour)
+	cutoff := time.Now().UTC().Add(-5 * 365 * 24 * time.Hour)
 	queries := []string{
 		`DELETE FROM incident_evidence WHERE incident_id IN (SELECT id FROM incidents WHERE occurred_at < $1)`,
 		`DELETE FROM raw_reports WHERE published_at < $1`,

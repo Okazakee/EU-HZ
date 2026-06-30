@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "opencode/big-pickle",
+  "command": {
+    "x-ingest": {
+      "description": "Gather safety/crime news from whitelisted X.com pages, filter, smart-dedup, format, and POST to the EU-HZ ingest API. Runs the x-ingest skill.",
+      "template": "Load the x-ingest skill and run the full pipeline: gather recent safety/crime incidents from the whitelisted X.com handles via web search, filter to genuine EU street-level incidents, run the 3-layer smart dedup (intra-batch filter, cross-batch DB match, cross-source corroboration), format to the ingestItem JSON schema, and POST the batch to the local ingest API. Use the INGEST_KEY and API base URL from the environment.",
+      "agent": "build"
+    }
+  }
+}
