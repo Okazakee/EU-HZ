@@ -8,9 +8,9 @@ export const appDescription =
 export const appTagline = "Recent travel awareness across Europe.";
 
 export const ogImage = {
-  url: "/opengraph.png",
-  width: 1731,
-  height: 909,
+  url: "/opengraph.jpg",
+  width: 1200,
+  height: 630,
   alt: appName,
 };
 
