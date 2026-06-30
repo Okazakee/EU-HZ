@@ -2,6 +2,8 @@
 
 Europe-focused heat-zone PWA for recent safety-awareness checks by country or city.
 
+![EU - Heat Zones](apps/web/public/euhz.png)
+
 The repo is a small monorepo:
 
 - `apps/api`: Go API for places, reports, heat cells, ingest filtering, and incident details.
