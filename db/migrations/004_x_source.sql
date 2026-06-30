@@ -1,0 +1,13 @@
+ALTER TABLE sources
+  DROP CONSTRAINT IF EXISTS sources_type_check;
+
+ALTER TABLE sources
+  ADD COLUMN IF NOT EXISTS x_handle TEXT;
+
+ALTER TABLE sources
+  ADD COLUMN IF NOT EXISTS country_code TEXT;
+
+ALTER TABLE raw_reports
+  ADD COLUMN IF NOT EXISTS x_post_id TEXT,
+  ADD COLUMN IF NOT EXISTS x_posted_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS normalized_payload JSONB;

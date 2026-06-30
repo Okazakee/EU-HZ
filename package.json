@@ -1,0 +1,10 @@
+{
+  "name": "eu-hz",
+  "private": true,
+  "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "build:web": "pnpm --filter web build",
+    "lint": "pnpm --filter web lint",
+    "typecheck": "pnpm --filter web typecheck"
+  }
+}
