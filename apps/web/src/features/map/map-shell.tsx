@@ -20,12 +20,12 @@ const eventTone: Record<string, { fill: string; stroke: string }> = {
 };
 
 const INITIAL_VIEW = {
-  center: [10.5, 50.3] as [number, number],
+  center: [10.5, 45.3] as [number, number],
   zoom: 4.2,
 };
 
 const EUROPE_BOUNDS: LngLatBoundsLike = [
-  [-15, 33],
+  [-15, 20],
   [35, 64],
 ];
 const DARK_STYLE_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
@@ -136,7 +136,7 @@ export function MapShell({ cells, selectedCellId, focusTarget, onViewportIdle }:
   }, [cells]);
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-slate-950">
+    <div className="relative h-dvh w-screen overflow-hidden bg-slate-950">
       <div ref={containerRef} className="h-full w-full" />
       <svg className="pointer-events-none absolute inset-0 h-full w-full">
         {projectedCells.map((cell) => {
@@ -155,7 +155,7 @@ export function MapShell({ cells, selectedCellId, focusTarget, onViewportIdle }:
           );
         })}
       </svg>
-      <div className="absolute bottom-16 left-4 z-30 flex flex-col gap-2 md:bottom-[4.5rem] md:left-5">
+      <div className="absolute right-3 top-[4.5rem] z-30 flex flex-col gap-2 md:bottom-[4.5rem] md:left-5 md:right-auto md:top-auto">
         <button
           aria-label="Zoom in"
           className="h-11 w-11 rounded-2xl border border-white/12 bg-slate-950/88 text-2xl leading-none text-white shadow-lg backdrop-blur hover:bg-slate-900"

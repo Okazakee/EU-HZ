@@ -42,6 +42,7 @@ export default function Home() {
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
   const [devOpen, setDevOpen] = useState(false);
+  const [reportsCollapsed, setReportsCollapsed] = useState(false);
 
   const onboardingOpen =
     !hydrated || !(onboardingDismissed || window.localStorage.getItem("hz-onboarding-complete") === "1");
@@ -77,7 +78,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative h-screen overflow-hidden bg-slate-950 text-slate-100">
+    <main className="relative h-dvh overflow-hidden bg-slate-950 text-slate-100">
       <MapShell
         cells={heatQuery.data?.cells ?? []}
         selectedCellId={selectedCellId}
@@ -85,8 +86,8 @@ export default function Home() {
         onViewportIdle={setBounds}
       />
 
-      <div className="pointer-events-none absolute left-0 right-0 top-0 z-20 hidden p-5 md:block">
-        <div className="pointer-events-auto flex w-full max-w-[520px] items-center gap-3">
+      <div className="pointer-events-none absolute left-0 right-0 top-0 z-20 p-3 md:p-5">
+        <div className="pointer-events-auto flex w-full items-center gap-2 md:max-w-[520px] md:gap-3">
           <BrandMark compact showTagline={false} className="shrink-0" />
           <div className="flex-1">
             <SearchBar disabled={onboardingOpen} onSelect={handleSelectPlace} />
@@ -97,29 +98,15 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex justify-center p-3 md:hidden">
-        <BrandMark
-          compact
-          showTagline={false}
-          className="pointer-events-auto rounded-full border border-white/10 bg-slate-950/70 px-3 py-2 shadow-[0_16px_40px_rgba(2,6,23,0.45)] backdrop-blur"
-        />
-      </div>
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-[calc(42vh+0.75rem)] z-20 px-3 md:hidden">
-        <div className="flex justify-center">
-          <div className="pointer-events-auto w-full max-w-[520px]">
-            <SearchBar disabled={onboardingOpen} onSelect={handleSelectPlace} />
-          </div>
-        </div>
-      </div>
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-[3.5rem] z-20 p-3 md:top-0 md:right-0 md:left-auto md:flex md:w-[520px] md:items-end md:p-5 md:pb-[4.5rem]">
+      <div className="pointer-events-none absolute inset-x-0 bottom-[1.75rem] z-20 p-3 md:top-0 md:right-0 md:left-auto md:flex md:w-[520px] md:items-end md:p-5 md:pb-[4.5rem]">
         <div className="pointer-events-auto w-full md:h-full md:max-h-none">
           <ReportsPanel
             reports={reportItems}
             isLoading={isPanelLoading}
             hasMore={Boolean(reportsQuery.hasNextPage)}
             onSelectReport={setSelectedReportId}
+            collapsed={reportsCollapsed}
+            onToggleCollapse={() => setReportsCollapsed((c) => !c)}
             onLoadMore={() => {
               if (reportsQuery.hasNextPage && !reportsQuery.isFetchingNextPage) {
                 void reportsQuery.fetchNextPage();

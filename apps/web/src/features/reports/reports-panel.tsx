@@ -11,6 +11,8 @@ type ReportsPanelProps = {
   hasMore: boolean;
   onLoadMore: () => void;
   onSelectReport: (publicId: string) => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 };
 
 const statusTone: Record<ReportItem["status"], "amber" | "orange" | "emerald"> = {
@@ -71,7 +73,7 @@ function EventGlyph({ type }: { type: string }) {
   }
 }
 
-export function ReportsPanel({ reports, isLoading, hasMore, onLoadMore, onSelectReport }: ReportsPanelProps) {
+export function ReportsPanel({ reports, isLoading, hasMore, onLoadMore, onSelectReport, collapsed = false, onToggleCollapse }: ReportsPanelProps) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -90,15 +92,24 @@ export function ReportsPanel({ reports, isLoading, hasMore, onLoadMore, onSelect
     return () => observer.disconnect();
   }, [onLoadMore]);
 
+  const HeaderTag = onToggleCollapse ? "button" : "div";
+  const headerProps = onToggleCollapse
+    ? { type: "button" as const, onClick: onToggleCollapse, className: "mb-4 flex w-full items-start justify-between gap-4 text-left md:cursor-default" }
+    : { className: "mb-4 flex items-start justify-between gap-4" };
+
   return (
-    <section className="flex max-h-[42vh] flex-col rounded-[28px_28px_0_0] border border-white/10 bg-slate-950/90 p-4 text-slate-100 shadow-[0_30px_90px_rgba(2,6,23,0.5)] backdrop-blur md:h-full md:max-h-none md:rounded-[32px]">
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div>
+    <section
+      className={`flex flex-col rounded-[28px_28px_0_0] border border-white/10 bg-slate-950/90 p-4 text-slate-100 shadow-[0_30px_90px_rgba(2,6,23,0.5)] backdrop-blur transition-[max-height] duration-300 ease-in-out md:h-full md:max-h-none md:rounded-[32px] ${
+        collapsed ? "max-h-[5rem] overflow-hidden md:max-h-none" : "max-h-[38vh] md:max-h-none"
+      }`}
+    >
+      <HeaderTag {...headerProps}>
+        <div className="min-w-0 flex-1">
           <h2 className="text-xl font-semibold text-slate-50">Travel awareness</h2>
-          <p className="mt-1 text-sm text-slate-400">Recent reports inside the visible map area.</p>
+          <p className="mt-1 truncate text-sm text-slate-400">Recent reports inside the visible map area.</p>
         </div>
         <div
-          className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium ${
+          className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium ${
             isLoading
               ? "border-red-500/30 bg-red-500/10 text-red-100"
               : "border-white/10 bg-white/5 text-slate-300"
@@ -109,9 +120,15 @@ export function ReportsPanel({ reports, isLoading, hasMore, onLoadMore, onSelect
               isLoading ? "animate-pulse bg-red-400 shadow-[0_0_14px_rgba(248,113,113,0.8)]" : "bg-emerald-400"
             }`}
           />
-          <span>{isLoading ? "Loading data" : "Live data"}</span>
+          <span className="hidden sm:inline">{isLoading ? "Loading data" : "Live data"}</span>
+          <span className="sm:hidden">{isLoading ? "···" : "Live"}</span>
         </div>
-      </div>
+        {onToggleCollapse ? (
+          <span className="ml-1 shrink-0 text-lg leading-none text-slate-400 md:hidden" aria-hidden>
+            {collapsed ? "▴" : "▾"}
+          </span>
+        ) : null}
+      </HeaderTag>
 
       <div className="flex-1 space-y-3 overflow-y-auto pr-1">
         {reports.length === 0 ? (
@@ -140,12 +157,12 @@ function ReportCard({ report, onOpen }: { report: ReportItem; onOpen: () => void
 
   return (
     <button
-      className={`relative aspect-video w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br ${tone.shell} p-4 text-left shadow-sm cursor-pointer`}
+      className={`relative aspect-[3/1] w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br ${tone.shell} p-3 text-left shadow-sm cursor-pointer md:aspect-video md:p-4`}
       onClick={onOpen}
       type="button"
     >
       <div className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.badge} opacity-60`}>
-        <div className="h-32 w-32">
+        <div className="h-20 w-20 md:h-32 md:w-32">
           <EventGlyph type={report.eventType} />
         </div>
       </div>
@@ -154,7 +171,7 @@ function ReportCard({ report, onOpen }: { report: ReportItem; onOpen: () => void
           <h3 className="line-clamp-2 text-base font-semibold text-slate-50">{report.title}</h3>
           <div className="truncate text-sm text-slate-200">{report.locationLabel}</div>
         </div>
-        <div className="mt-3 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-slate-400">
+        <div className="mt-1 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-slate-400 md:mt-3">
           <span>{new Date(report.occurredAt).toLocaleDateString()}</span>
         </div>
       </div>
