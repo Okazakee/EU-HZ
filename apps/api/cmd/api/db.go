@@ -215,7 +215,7 @@ func (s *store) recentIncidents(ctx context.Context) ([]normalizedIncident, erro
 		SELECT title, summary, event_type, confidence, status, occurred_at, location_label, geo_precision, lat, lng, country_code, city
 		FROM incidents
 		WHERE status <> 'rejected'
-		  AND occurred_at >= now() - interval '6 months'
+		  AND occurred_at >= now() - interval '5 years'
 	`)
 	if err != nil {
 		return nil, err
@@ -369,7 +369,7 @@ func (s *store) reports(ctx context.Context, params queryFilters) ([]report, str
 				i.occurred_at,
 				i.location_label
 			FROM incidents i
-			WHERE i.occurred_at >= now() - interval '6 months'
+			WHERE i.occurred_at >= now() - interval '5 years'
 			  AND i.lng BETWEEN $1 AND $2
 			  AND i.lat BETWEEN $3 AND $4
 			  AND ($5::float8 <= 0 OR i.confidence >= $5)
@@ -387,7 +387,7 @@ func (s *store) reports(ctx context.Context, params queryFilters) ([]report, str
 				i.occurred_at,
 				i.location_label
 			FROM incidents i
-			WHERE i.occurred_at >= now() - interval '6 months'
+			WHERE i.occurred_at >= now() - interval '5 years'
 			  AND i.occurred_at < $1
 			  AND i.lng BETWEEN $2 AND $3
 			  AND i.lat BETWEEN $4 AND $5

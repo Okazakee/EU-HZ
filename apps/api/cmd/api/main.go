@@ -112,6 +112,10 @@ func aggregateHeat(ctx context.Context, db *store) error {
 		return err
 	}
 	log.Printf("aggregate: cells=%d incidents=%d", len(aggregates), len(incidents))
+	if err := db.cleanup(ctx); err != nil {
+		return err
+	}
+	log.Printf("cleanup: done")
 	return nil
 }
 
