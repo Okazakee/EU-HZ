@@ -14,7 +14,16 @@ ALTER TABLE heat_cells
 ALTER TABLE heat_cells
   DROP CONSTRAINT IF EXISTS heat_cells_range_key_check;
 
-ALTER TABLE heat_cells
-  ADD PRIMARY KEY (cell_key);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE constraint_type = 'PRIMARY KEY'
+      AND table_name = 'heat_cells'
+  ) THEN
+    ALTER TABLE heat_cells ADD PRIMARY KEY (cell_key);
+  END IF;
+END;
+$$;
 
 DROP INDEX IF EXISTS heat_cells_range_idx;

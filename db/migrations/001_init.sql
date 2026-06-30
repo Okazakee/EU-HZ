@@ -97,4 +97,13 @@ CREATE TABLE IF NOT EXISTS heat_cells (
   PRIMARY KEY (cell_key, range_key)
 );
 
-CREATE INDEX IF NOT EXISTS heat_cells_range_idx ON heat_cells (range_key);
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'heat_cells' AND column_name = 'range_key'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS heat_cells_range_idx ON heat_cells (range_key);
+  END IF;
+END;
+$$;
