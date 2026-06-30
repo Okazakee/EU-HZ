@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://euhz.vercel.app"),
+  metadataBase: new URL("https://eu-hz.vercel.app"),
   title: appName,
   description: appDescription,
   applicationName: appName,
