@@ -35,33 +35,59 @@ function EventGlyph({ type }: { type: string }) {
     case "murder":
       return (
         <svg viewBox="0 0 64 64" fill="none" className={common}>
-          <path d="M40 8L20 28L26 34L46 14L40 8Z" strokeWidth="3" strokeLinejoin="round" />
-          <rect x="17" y="30" width="10" height="22" rx="3" transform="rotate(45 22 41)" strokeWidth="3" />
-          <path d="M22 52C20 55 18 56 16 56" strokeWidth="3" strokeLinecap="round" />
-          <circle cx="18" cy="55" r="2.5" fill="currentColor" stroke="none" />
+          <path d="M32 8L38 32L32 38L26 32Z" strokeWidth="3" strokeLinejoin="round" />
+          <path d="M20 34H44" strokeWidth="3" strokeLinecap="round" />
+          <path d="M32 38V52" strokeWidth="3" strokeLinecap="round" />
+          <circle cx="32" cy="56" r="3" strokeWidth="3" />
         </svg>
       );
     case "harassment":
       return (
         <svg viewBox="0 0 64 64" fill="none" className={common}>
-          <path d="M20 30V18a4 4 0 0 1 8 0V28M28 28V14a4 4 0 0 1 8 0V28M36 28V18a4 4 0 0 1 8 0V30M20 28L16 36a8 8 0 0 0 8 10h12a8 8 0 0 0 8-8V30" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M12 12L52 52" strokeWidth="3" strokeLinecap="round" />
+          <path
+            d="M14 16h24a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4H24l-8 8v-8h-2a4 4 0 0 1-4-4V20a4 4 0 0 1 4-4Z"
+            strokeWidth="3"
+            strokeLinejoin="round"
+            opacity="0.35"
+          />
+          <path
+            d="M26 26h24a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4h-2v8l-8-8H26a4 4 0 0 1-4-4V30a4 4 0 0 1 4-4Z"
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <path d="M38 34v6" strokeWidth="3" strokeLinecap="round" />
+          <circle cx="38" cy="44" r="1.5" fill="currentColor" stroke="none" />
         </svg>
       );
     case "assault":
       return (
         <svg viewBox="0 0 64 64" fill="none" className={common}>
-          <path d="M22 36C22 30 22 24 28 24C34 24 34 30 34 36V40H22V36Z" strokeWidth="3" strokeLinejoin="round" />
-          <path d="M34 36C36 30 40 28 44 30C48 32 46 38 44 42L40 48H34" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M22 40L18 46L22 50" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M20 26a4 4 0 0 1 8 0v2M28 24a4 4 0 0 1 8 0v4M36 24a4 4 0 0 1 8 0v4"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+          <path
+            d="M18 28v8c0 10 8 18 18 18s18-8 18-18v-4"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path d="M18 32c-4 0-6 3-6 6s2 6 6 6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M46 14l4-4M50 20h6M46 26l4 3" strokeWidth="3" strokeLinecap="round" />
         </svg>
       );
     case "robbery":
       return (
         <svg viewBox="0 0 64 64" fill="none" className={common}>
-          <path d="M24 20L28 12H36L40 20" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M18 20H46L50 32C52 40 50 48 46 52H18C14 48 12 40 14 32L18 20Z" strokeWidth="3" strokeLinejoin="round" />
-          <path d="M32 30V44M28 34C28 31 30 30 32 30C34 30 36 31 36 34C36 37 32 38 32 38" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M32 10c-10 0-16 8-16 18v10c0 4 2 6 4 6h24c2 0 4-2 4-6V28c0-10-6-18-16-18Z"
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <ellipse cx="25" cy="30" rx="4" ry="3" strokeWidth="3" />
+          <ellipse cx="39" cy="30" rx="4" ry="3" strokeWidth="3" />
+          <path d="M20 40h24" strokeWidth="3" strokeLinecap="round" />
         </svg>
       );
     default:
@@ -99,25 +125,25 @@ export function ReportsPanel({ reports, isLoading, hasMore, onLoadMore, onSelect
 
   return (
     <section
-      className={`flex flex-col rounded-[28px_28px_0_0] border border-white/10 bg-slate-950/90 p-4 text-slate-100 shadow-[0_30px_90px_rgba(2,6,23,0.5)] backdrop-blur transition-[max-height] duration-300 ease-in-out md:h-full md:max-h-none md:rounded-[32px] ${
+      className={`cyber-panel cyber-panel-strong cyber-cut cyber-scanlines flex flex-col p-4 text-slate-100 transition-[max-height] duration-300 ease-in-out md:h-full md:max-h-none ${
         collapsed ? "max-h-[5rem] overflow-hidden md:max-h-none" : "max-h-[38vh] md:max-h-none"
       }`}
     >
       <HeaderTag {...headerProps}>
         <div className="min-w-0 flex-1">
-          <h2 className="text-xl font-semibold text-slate-50">Travel awareness</h2>
+          <h2 className="cyber-title text-[1.35rem] font-semibold text-[var(--accent)]">Travel awareness</h2>
           <p className="mt-1 truncate text-sm text-slate-400">Recent reports inside the visible map area.</p>
         </div>
         <div
-          className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium ${
+          className={`cyber-cut cyber-title inline-flex shrink-0 items-center gap-2 border px-3 py-2 text-[11px] font-semibold ${
             isLoading
-              ? "border-red-500/30 bg-red-500/10 text-red-100"
-              : "border-white/10 bg-white/5 text-slate-300"
+              ? "border-[#ff623d]/40 bg-[#29120d]/90 text-[#ff8f74]"
+              : "border-[var(--line-soft)] bg-[#0b1320]/90 text-[var(--accent-alt)]"
           }`}
         >
           <span
             className={`h-2.5 w-2.5 rounded-full ${
-              isLoading ? "animate-pulse bg-red-400 shadow-[0_0_14px_rgba(248,113,113,0.8)]" : "bg-emerald-400"
+              isLoading ? "animate-pulse bg-[#ff623d] shadow-[0_0_14px_rgba(255,98,61,0.8)]" : "bg-[var(--accent)] shadow-[0_0_14px_rgba(245,208,0,0.7)]"
             }`}
           />
           <span className="hidden sm:inline">{isLoading ? "Loading data" : "Live data"}</span>
@@ -130,23 +156,25 @@ export function ReportsPanel({ reports, isLoading, hasMore, onLoadMore, onSelect
         ) : null}
       </HeaderTag>
 
-      <div className="flex-1 space-y-3 overflow-y-auto pr-1">
-        {reports.length === 0 ? (
-          <SurfaceCard className="border-dashed border-white/14 p-6 text-sm text-slate-400">
-            No recent reports were found in this view. Zoom out or search another country or city.
-          </SurfaceCard>
-        ) : null}
+      <div className="cyber-scrollbar flex-1 overflow-y-auto">
+        <div className="space-y-3 pr-3">
+          {reports.length === 0 ? (
+            <SurfaceCard className="border border-dashed border-[var(--line)]/40 p-6 text-sm text-slate-400">
+              No recent reports were found in this view. Zoom out or search another country or city.
+            </SurfaceCard>
+          ) : null}
 
-        {reports.map((report) => (
-          <ReportCard key={report.publicId} report={report} onOpen={() => onSelectReport(report.publicId)} />
-        ))}
-        {hasMore ? (
-          <SurfaceCard
-            className="border-dashed border-white/14 p-4 text-center text-sm text-slate-400"
-          >
-            <div ref={loadMoreRef}>Loading more reports...</div>
-          </SurfaceCard>
-        ) : null}
+          {reports.map((report) => (
+            <ReportCard key={report.publicId} report={report} onOpen={() => onSelectReport(report.publicId)} />
+          ))}
+          {hasMore ? (
+            <SurfaceCard
+              className="border border-dashed border-[var(--line)]/40 p-4 text-center text-sm text-slate-400"
+            >
+              <div ref={loadMoreRef}>Loading more reports...</div>
+            </SurfaceCard>
+          ) : null}
+        </div>
       </div>
     </section>
   );
@@ -157,10 +185,11 @@ function ReportCard({ report, onOpen }: { report: ReportItem; onOpen: () => void
 
   return (
     <button
-      className={`relative aspect-[3/1] w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br ${tone.shell} p-3 text-left shadow-sm cursor-pointer md:aspect-video md:p-4`}
+      className={`cyber-cut relative aspect-[3/1] w-full cursor-pointer overflow-hidden border border-[var(--line)]/40 bg-gradient-to-br ${tone.shell} p-3 text-left shadow-[0_18px_40px_rgba(0,0,0,0.34)] md:aspect-video md:p-4`}
       onClick={onOpen}
       type="button"
     >
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(245,208,0,0.1),transparent_34%),linear-gradient(315deg,rgba(95,232,255,0.08),transparent_32%)]" />
       <div className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.badge} opacity-60`}>
         <div className="h-20 w-20 md:h-32 md:w-32">
           <EventGlyph type={report.eventType} />
@@ -169,13 +198,13 @@ function ReportCard({ report, onOpen }: { report: ReportItem; onOpen: () => void
       <div className="relative flex h-full flex-col justify-between">
         <div className="space-y-2 pr-24">
           <h3 className="line-clamp-2 text-base font-semibold text-slate-50">{report.title}</h3>
-          <div className="truncate text-sm text-slate-200">{report.locationLabel}</div>
+          <div className="cyber-title truncate text-[11px] text-[var(--accent-alt)]">{report.locationLabel}</div>
         </div>
-        <div className="mt-1 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-slate-400 md:mt-3">
+        <div className="cyber-mono mt-1 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-slate-400 md:mt-3">
           <span>{new Date(report.occurredAt).toLocaleDateString("en-GB")}</span>
         </div>
       </div>
-      <Eyebrow className="absolute top-3 right-3 z-10 text-slate-400">{report.eventType}</Eyebrow>
+      <Eyebrow className="absolute top-3 right-3 z-10 text-[var(--accent)]">{report.eventType}</Eyebrow>
       <Pill tone={statusTone[report.status]} className="absolute bottom-3 right-3 z-10">{report.status}</Pill>
     </button>
   );

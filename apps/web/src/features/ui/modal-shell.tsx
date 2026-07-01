@@ -32,16 +32,16 @@ export function ModalShell({ open, title, children, onClose, footer, dismissible
   }
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/72 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-2xl overflow-hidden rounded-[32px] border border-white/10 bg-slate-950 text-slate-100 shadow-[0_30px_120px_rgba(2,6,23,0.72)]">
-        <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
-          <h2 className="text-lg font-semibold">{title}</h2>
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#030407]/78 p-4 backdrop-blur-sm">
+      <div className="cyber-panel cyber-panel-strong cyber-cut-lg cyber-scanlines w-full max-w-2xl overflow-hidden text-slate-100">
+        <div className="flex items-center justify-between gap-4 border-b border-[var(--line)]/35 px-5 py-4">
+          <h2 className="cyber-title text-lg font-semibold text-[var(--accent)]">{title}</h2>
           {dismissible ? (
             <IconButton label="Close" onClick={onClose}>x</IconButton>
           ) : null}
         </div>
         <div className="max-h-[70vh] overflow-y-auto px-5 py-5">{children}</div>
-        {footer ? <div className="border-t border-white/10 px-5 py-4">{footer}</div> : null}
+        {footer ? <div className="border-t border-[var(--line)]/35 px-5 py-4">{footer}</div> : null}
       </div>
     </div>
   );

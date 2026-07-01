@@ -46,7 +46,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4 text-slate-100">
         <ModalShell open={true} title="Something broke" dismissible={false} onClose={() => undefined}>
           <div className="space-y-5">
-            <p className="text-sm leading-7 text-slate-300">
+            <p className="text-base leading-7 text-slate-300">
               The app hit an unrecoverable error. Reload the page to retry. If it keeps happening, copy the details below and report it.
             </p>
             <SurfaceCard className="space-y-2">

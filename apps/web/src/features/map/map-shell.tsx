@@ -13,10 +13,10 @@ type MapShellProps = {
 };
 
 const eventTone: Record<string, { fill: string; stroke: string }> = {
-  harassment: { fill: "190 24 93", stroke: "rgba(131, 24, 67, 0.95)" },
-  assault: { fill: "185 28 28", stroke: "rgba(127, 29, 29, 0.95)" },
-  robbery: { fill: "180 83 9", stroke: "rgba(120, 53, 15, 0.95)" },
-  violence: { fill: "109 40 217", stroke: "rgba(76, 29, 149, 0.95)" },
+  harassment: { fill: "190 24 93", stroke: "rgba(255, 90, 160, 0.95)" },
+  assault: { fill: "185 28 28", stroke: "rgba(255, 80, 70, 0.95)" },
+  robbery: { fill: "180 83 9", stroke: "rgba(255, 200, 60, 0.95)" },
+  violence: { fill: "109 40 217", stroke: "rgba(180, 120, 255, 0.95)" },
 };
 
 const INITIAL_VIEW = {
@@ -30,6 +30,7 @@ const EUROPE_BOUNDS: LngLatBoundsLike = [
 ];
 const DARK_STYLE_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 const HEAT_SOURCE_ID = "heat-cells";
+const HEAT_GLOW_LAYER_ID = "heat-cells-glow";
 const HEAT_FILL_LAYER_ID = "heat-cells-fill";
 const HEAT_LINE_LAYER_ID = "heat-cells-line";
 const HEAT_SELECTED_FILL_LAYER_ID = "heat-cells-selected-fill";
@@ -105,9 +106,25 @@ export function MapShell({ cells, selectedCellId, focusTarget, onViewportIdle }:
     };
 
     map.on("load", () => {
+      applyCyberTheme(map);
+
       map.addSource(HEAT_SOURCE_ID, {
         type: "geojson",
         data: buildHeatFeatureCollection(cellsRef.current, map.getZoom()),
+      });
+
+      map.addLayer({
+        id: HEAT_GLOW_LAYER_ID,
+        type: "line",
+        source: HEAT_SOURCE_ID,
+        filter: ["!=", ["get", "id"], ""],
+        paint: {
+          "line-color": ["get", "stroke"],
+          "line-width": 8,
+          "line-blur": 10,
+          "line-opacity": ["get", "fillOpacity"],
+        },
+        layout: { "line-cap": "round", "line-join": "round" },
       });
 
       map.addLayer({
@@ -209,12 +226,13 @@ export function MapShell({ cells, selectedCellId, focusTarget, onViewportIdle }:
   }, [selectedCellId]);
 
   return (
-    <div className="relative h-dvh w-screen overflow-hidden bg-slate-950">
+    <div className="relative h-dvh w-screen overflow-hidden bg-[#05060a]">
       <div ref={containerRef} className="h-full w-full" />
+      <div className="cyber-map-overlay pointer-events-none absolute inset-0 z-[1]" />
       <div className="absolute right-3 top-[4.5rem] z-30 flex flex-col gap-2 md:bottom-[4.5rem] md:left-5 md:right-auto md:top-auto">
         <button
           aria-label="Zoom in"
-          className="h-11 w-11 rounded-2xl border border-white/12 bg-slate-950/88 text-2xl leading-none text-white shadow-lg backdrop-blur hover:bg-slate-900"
+          className="cyber-cut h-11 w-11 border border-white/12 bg-slate-950/88 text-2xl leading-none text-white shadow-lg backdrop-blur hover:border-[var(--accent)]/45 hover:text-[var(--accent)]"
           onClick={() => mapRef.current?.zoomIn()}
           type="button"
         >
@@ -222,7 +240,7 @@ export function MapShell({ cells, selectedCellId, focusTarget, onViewportIdle }:
         </button>
         <button
           aria-label="Zoom out"
-          className="h-11 w-11 rounded-2xl border border-white/12 bg-slate-950/88 text-2xl leading-none text-white shadow-lg backdrop-blur hover:bg-slate-900"
+          className="cyber-cut h-11 w-11 border border-white/12 bg-slate-950/88 text-2xl leading-none text-white shadow-lg backdrop-blur hover:border-[var(--accent)]/45 hover:text-[var(--accent)]"
           onClick={() => mapRef.current?.zoomOut()}
           type="button"
         >
@@ -305,4 +323,124 @@ function polygonCenter(polygon: HeatCell["polygon"]) {
     lng: total.lng / polygon.length,
     lat: total.lat / polygon.length,
   };
+}
+
+type paintOverride = Record<string, unknown>;
+
+function applyCyberTheme(map: Map) {
+  const setPaint = (layerId: string, props: paintOverride) => {
+    try {
+      const layer = map.getLayer(layerId);
+      if (!layer) {
+        return;
+      }
+      for (const [key, value] of Object.entries(props)) {
+        map.setPaintProperty(layerId, key, value);
+      }
+    } catch {
+      // Some layers may not accept the property; ignore.
+    }
+  };
+
+  setPaint("background", { "background-color": "#08090f" });
+
+  setPaint("water", {
+    "fill-color": "#0a1320",
+    "fill-outline-color": "rgba(95,232,255,0.22)",
+  });
+  setPaint("water_shadow", {
+    "fill-color": "#0c1626",
+  });
+
+  setPaint("landcover", { "fill-color": "#0c0e16" });
+  setPaint("landuse", { "fill-color": "#0c0e16" });
+  setPaint("landuse_residential", { "fill-color": "#0d0f18" });
+  setPaint("park_national_park", { "fill-color": "#0c1510" });
+  setPaint("park_nature_reserve", { "fill-color": "#0c1510" });
+
+  setPaint("building", { "fill-color": "#0e131c", "fill-outline-color": "rgba(95,232,255,0.1)" });
+  setPaint("building-top", { "fill-color": "#131c2e" });
+
+  for (const id of ["waterway"]) {
+    setPaint(id, { "line-color": "rgba(95,232,255,0.22)" });
+  }
+
+  setPaint("boundary_county", { "line-color": "rgba(245,208,0,0.16)", "line-width": 0.6 });
+  setPaint("boundary_state", { "line-color": "rgba(245,208,0,0.22)", "line-width": 0.8 });
+  setPaint("boundary_country_outline", { "line-color": "rgba(245,208,0,0.7)", "line-width": 1 });
+  setPaint("boundary_country_inner", { "line-color": "rgba(245,208,0,0.78)", "line-width": 1 });
+
+  try {
+    map.addLayer({
+      id: "boundary_country_silhouette",
+      type: "line",
+      source: "carto",
+      "source-layer": "boundary",
+      minzoom: 0,
+      filter: ["==", ["get", "admin_level"], 2],
+      layout: { "line-cap": "round", "line-join": "round" },
+      paint: {
+        "line-color": "rgba(245,208,0,0.78)",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 3, 1.1, 6, 1.6, 9, 2.2],
+        "line-opacity": ["interpolate", ["linear"], ["zoom"], 3, 0.9, 9, 0.55],
+        "line-blur": 0.6,
+      },
+    }, "boundary_county");
+  } catch {
+    // Source geometry may not be ready; ignore.
+  }
+
+  const roadTints: Record<string, string> = {
+    mot: "rgba(245,208,0,0.72)",
+    trunk: "rgba(255,170,40,0.62)",
+    pri: "rgba(255,160,60,0.5)",
+    sec: "rgba(95,232,255,0.42)",
+  };
+  const roadDim: Record<string, string> = { road_service: "#0a0f17", road_minor: "#0b0f17", road_path: "#0a0d12" };
+
+  for (const id of map.getStyle().layers.map((l) => l.id)) {
+    if (id.startsWith("tunnel") || id.startsWith("bridge")) {
+      if (id.includes("case")) {
+        setPaint(id, { "line-color": "#06070b" });
+      } else if (id.includes("rail")) {
+        setPaint(id, { "line-color": "rgba(95,232,255,0.18)" });
+      }
+      continue;
+    }
+    if (!id.startsWith("road_")) {
+      continue;
+    }
+    if (id.includes("case")) {
+      setPaint(id, { "line-color": "#05060a" });
+      continue;
+    }
+    const tierKey = Object.keys(roadTints).find((t) => id.includes(`_${t}_`));
+    if (tierKey) {
+      setPaint(id, { "line-color": roadTints[tierKey], "line-blur": 1.4 });
+      continue;
+    }
+    const dimKey = Object.keys(roadDim).find((base) => id.startsWith(base));
+    setPaint(id, { "line-color": dimKey ? roadDim[dimKey] : "#0a0f17" });
+  }
+
+  for (const id of map.getStyle().layers.map((l) => l.id)) {
+    const layer = map.getLayer(id);
+    if (!layer || layer.type !== "symbol") {
+      continue;
+    }
+    try {
+      map.setPaintProperty(id, "text-halo-color", "#040508");
+      map.setPaintProperty(id, "text-halo-blur", 0);
+      map.setPaintProperty(id, "text-halo-width", 1.4);
+      if (id.startsWith("water_name") || id.startsWith("waterway_label")) {
+        map.setPaintProperty(id, "text-color", "rgba(95,232,255,0.85)");
+      } else if (id.startsWith("place_country")) {
+        map.setPaintProperty(id, "text-color", "rgba(245,208,0,0.92)");
+      } else {
+        map.setPaintProperty(id, "text-color", "rgba(244,247,251,0.92)");
+      }
+    } catch {
+      // Symbol paint prop missing on some layers; ignore.
+    }
+  }
 }

@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <span className={`text-xs uppercase tracking-[0.18em] text-slate-500 ${className}`}>
+    <span className={`cyber-title text-[12px] font-semibold tracking-[0.24em] text-[var(--accent-alt)]/85 ${className}`}>
       {children}
     </span>
   );
@@ -12,11 +12,11 @@ export function Eyebrow({ children, className = "" }: { children: ReactNode; cla
 type PillTone = "slate" | "red" | "amber" | "orange" | "emerald";
 
 const pillTone: Record<PillTone, string> = {
-  slate: "bg-white/8 text-slate-200 hover:bg-white/14",
-  red: "bg-red-700 text-white",
-  amber: "bg-amber-500/18 text-amber-100",
-  orange: "bg-orange-500/18 text-orange-100",
-  emerald: "bg-emerald-500/18 text-emerald-100",
+  slate: "border-[var(--line-soft)] bg-[#101726]/90 text-slate-100 hover:bg-[#161f31]",
+  red: "border-[#ff623d]/50 bg-[#31130d]/95 text-[#ff8d72]",
+  amber: "border-[var(--line)] bg-[#231f05]/95 text-[#ffe46d]",
+  orange: "border-[#ff8c42]/45 bg-[#29170a]/95 text-[#ffb574]",
+  emerald: "border-[#6bffb0]/38 bg-[#0f241d]/95 text-[#94ffc5]",
 };
 
 type PillProps = {
@@ -34,7 +34,7 @@ export function Pill({ children, tone = "slate", size = "sm", active, onClick, c
   const interactive = onClick ? "cursor-pointer" : "";
   return (
     <span
-      className={`inline-flex items-center rounded-full ${sizing} ${resolved} ${interactive} ${className}`}
+      className={`cyber-cut cyber-title inline-flex items-center border ${sizing} ${resolved} ${interactive} ${className}`}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
@@ -54,7 +54,7 @@ type PrimaryButtonProps = {
 };
 
 export function PrimaryButton({ children, onClick, href, type = "button", className = "" }: PrimaryButtonProps) {
-  const cls = `block w-full rounded-2xl bg-red-700 px-4 py-3 text-center text-sm font-medium text-white cursor-pointer hover:bg-red-600 ${className}`;
+  const cls = `cyber-cut cyber-title cyber-glow block w-full cursor-pointer border border-[var(--line)] bg-[linear-gradient(90deg,rgba(245,208,0,0.96),rgba(255,145,0,0.92))] px-4 py-3 text-center text-sm font-semibold text-slate-950 transition hover:brightness-105 ${className}`;
   if (href) {
     if (href.startsWith("/")) {
       return (
@@ -89,7 +89,7 @@ export function IconButton({ label, children, onClick, size = "md", className = 
   return (
     <button
       aria-label={label}
-      className={`flex ${dims} items-center justify-center rounded-full bg-white/10 text-slate-200 cursor-pointer hover:bg-white/18 ${className}`}
+      className={`cyber-cut flex ${dims} cursor-pointer items-center justify-center border border-[var(--line-soft)] bg-[#0b1320]/88 text-[var(--accent-alt)] transition hover:border-[var(--accent)]/50 hover:text-[var(--accent)] ${className}`}
       onClick={onClick}
       type="button"
     >
@@ -106,7 +106,7 @@ type SurfaceCardProps = {
 
 export function SurfaceCard({ children, className = "", id }: SurfaceCardProps) {
   return (
-    <div id={id} className={`rounded-3xl border border-white/10 bg-white/5 p-4 ${className}`}>
+    <div id={id} className={`cyber-panel cyber-cut cyber-scanlines p-4 ${className}`}>
       {children}
     </div>
   );

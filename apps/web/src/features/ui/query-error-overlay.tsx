@@ -31,12 +31,12 @@ export function QueryErrorOverlay({ queries }: QueryErrorOverlayProps) {
       )}
     >
       <div className="space-y-4">
-        <p className="text-sm leading-7 text-slate-300">
+        <p className="text-base leading-7 text-slate-300">
           The backend or database appears to be down. The app cannot load fresh data. Retry to reconnect — the map will recover automatically once the service is back.
         </p>
         <SurfaceCard className="space-y-2">
           <Eyebrow>{failed.label}</Eyebrow>
-          <div className="text-sm text-red-200">{error.message}</div>
+          <div className="cyber-mono text-sm text-[#ff8d72]">{error.message}</div>
         </SurfaceCard>
       </div>
     </ModalShell>

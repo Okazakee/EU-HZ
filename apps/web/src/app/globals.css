@@ -2,15 +2,22 @@
 @import "tailwindcss";
 
 :root {
-  --background: #e2e8f0;
-  --foreground: #0f172a;
+  --background: #05060a;
+  --foreground: #f4f7fb;
+  --panel: rgba(7, 10, 18, 0.84);
+  --panel-strong: rgba(8, 11, 20, 0.94);
+  --line: rgba(245, 208, 0, 0.3);
+  --line-soft: rgba(96, 232, 255, 0.18);
+  --accent: #f5d000;
+  --accent-alt: #5fe8ff;
+  --danger: #ff623d;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-body-sans);
+  --font-mono: var(--font-body-mono);
 }
 
 * {
@@ -26,10 +33,110 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), sans-serif;
+  font-family: var(--font-body-sans), sans-serif;
+  font-feature-settings: "kern", "liga", "calt";
+  text-rendering: optimizeLegibility;
+  background-image:
+    radial-gradient(circle at top left, rgba(245, 208, 0, 0.18), transparent 30%),
+    radial-gradient(circle at top right, rgba(95, 232, 255, 0.14), transparent 32%),
+    linear-gradient(180deg, rgba(5, 6, 10, 0.92), rgba(5, 6, 10, 0.98));
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+::selection {
+  background: rgba(245, 208, 0, 0.35);
+  color: #0a0b10;
+}
+
+.cyber-scanlines {
+  position: relative;
+}
+
+.cyber-scanlines::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04) 0,
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  opacity: 0.2;
+  mix-blend-mode: soft-light;
+}
+
+.cyber-map-overlay {
+  background-image:
+    linear-gradient(180deg, rgba(5, 6, 10, 0) 0%, rgba(5, 6, 10, 0.22) 100%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(95, 232, 255, 0.05) 0,
+      rgba(95, 232, 255, 0.05) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    radial-gradient(circle at top left, rgba(245, 208, 0, 0.12), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(95, 232, 255, 0.1), transparent 28%);
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-logo {
+  display: none !important;
+}
+
+.cyber-panel {
+  background:
+    linear-gradient(135deg, rgba(245, 208, 0, 0.08), transparent 26%),
+    linear-gradient(225deg, rgba(95, 232, 255, 0.07), transparent 30%),
+    var(--panel);
+  border: 1px solid var(--line);
+  box-shadow:
+    0 0 0 1px rgba(95, 232, 255, 0.06) inset,
+    0 24px 60px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(18px);
+}
+
+.cyber-panel-strong {
+  background:
+    linear-gradient(135deg, rgba(245, 208, 0, 0.1), transparent 24%),
+    linear-gradient(225deg, rgba(95, 232, 255, 0.08), transparent 28%),
+    var(--panel-strong);
+}
+
+.cyber-cut {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+.cyber-cut-lg {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
+
+.cyber-title {
+  font-family: var(--font-heading-sans), sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cyber-mono {
+  font-family: var(--font-body-mono), monospace;
+}
+
+.cyber-glow {
+  box-shadow:
+    0 0 0 1px rgba(245, 208, 0, 0.18) inset,
+    0 0 22px rgba(245, 208, 0, 0.14);
+}
+
+.cyber-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 208, 0, 0.35) rgba(8, 11, 20, 0.6);
 }

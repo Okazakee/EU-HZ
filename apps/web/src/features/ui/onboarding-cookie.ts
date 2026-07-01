@@ -1,0 +1,1 @@
+export const ONBOARDING_COOKIE = "hz-onboarding-complete";

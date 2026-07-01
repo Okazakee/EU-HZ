@@ -29,7 +29,7 @@ export function DevTools({ open, onClose, onShowOnboarding }: DevToolsProps) {
   return (
     <ModalShell open={open} title="Dev tools" onClose={onClose}>
       <div className="space-y-5">
-        <p className="text-sm leading-7 text-slate-300">
+        <p className="text-base leading-7 text-slate-300">
           Local-only triggers for testing error boundaries, query states, and cache behavior.
         </p>
 
@@ -151,7 +151,7 @@ export function DevTools({ open, onClose, onShowOnboarding }: DevToolsProps) {
         {log.length > 0 ? (
           <SurfaceCard className="space-y-2">
             <Eyebrow>Log</Eyebrow>
-            <div className="space-y-1 text-xs text-slate-400">
+            <div className="cyber-mono space-y-1 text-xs text-slate-400">
               {log.map((line, i) => (
                 <div key={i}>{line}</div>
               ))}
