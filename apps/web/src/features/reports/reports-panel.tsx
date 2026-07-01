@@ -93,7 +93,11 @@ function EventGlyph({ type }: { type: string }) {
     default:
       return (
         <svg viewBox="0 0 64 64" fill="none" className={common}>
-          <path d="M32 6L38 24L58 26L42 38L48 58L32 46L16 58L22 38L6 26L26 24L32 6Z" strokeWidth="3" strokeLinejoin="round" />
+          <path
+            d="M58 32L41 37L43 51L32 44L19 55L24 37L8 32L23 27L18 8L32 24L44 12L43 26Z"
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
         </svg>
       );
   }
