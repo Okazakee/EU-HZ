@@ -12,10 +12,16 @@ RUN cd apps/api && CGO_ENABLED=0 GOOS=linux go build -o /out/eu-hz-api ./cmd/api
 
 FROM alpine:3.22
 
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 WORKDIR /app/apps/api
 
 COPY --from=build /out/eu-hz-api ./eu-hz-api
 COPY db /app/db
+
+RUN chown -R appuser:appgroup /app
+
+USER appuser
 
 EXPOSE 8080
 

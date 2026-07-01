@@ -64,7 +64,7 @@ export function PrimaryButton({ children, onClick, href, type = "button", classN
       );
     }
     return (
-      <a className={cls} href={href} rel="noreferrer" target="_blank">
+      <a className={cls} href={href} rel="noopener noreferrer" target="_blank">
         {children}
       </a>
     );

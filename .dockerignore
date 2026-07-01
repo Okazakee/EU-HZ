@@ -1,7 +1,13 @@
+.env
+.env.*
 .git
-.next
+.gitignore
+.gitmodules
 node_modules
 apps/web/.next
 apps/web/node_modules
-apps/api/.cache
-tmp
+*.md
+LICENSE
+.DS_Store
+.opencode
+infra

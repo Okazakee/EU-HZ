@@ -77,6 +77,72 @@ type ingestFilterResponse struct {
 var stripTags = regexp.MustCompile(`<[^>]+>`)
 var collapseSpace = regexp.MustCompile(`\s+`)
 
+var validEventTypes = map[string]bool{
+	"harassment": true,
+	"robbery":    true,
+	"assault":    true,
+	"violence":   true,
+}
+
+var countryCodeRe = regexp.MustCompile(`^[A-Z]{2}$`)
+
+var dangerousURLSchemes = map[string]bool{
+	"javascript:": true,
+	"data:":       true,
+	"vbscript:":   true,
+	"file:":       true,
+}
+
+const (
+	maxTitleLen      = 500
+	maxSummaryLen    = 2000
+	maxLocationLen   = 300
+	maxHandleLen     = 100
+	maxPostIDLen     = 100
+	maxPostURLLen    = 2048
+	maxCityLen       = 200
+	maxItemsPerBatch = 500
+)
+
+func validateIngestItem(item ingestItem) bool {
+	if len(item.Title) > maxTitleLen {
+		return false
+	}
+	if len(item.Summary) > maxSummaryLen {
+		return false
+	}
+	if len(item.Location) > maxLocationLen {
+		return false
+	}
+	if len(item.XHandle) > maxHandleLen {
+		return false
+	}
+	if len(item.XPostID) > maxPostIDLen {
+		return false
+	}
+	if len(item.XPostURL) > maxPostURLLen {
+		return false
+	}
+	if len(item.City) > maxCityLen {
+		return false
+	}
+	if item.XPostURL != "" {
+		lowered := strings.ToLower(strings.TrimSpace(item.XPostURL))
+		for scheme := range dangerousURLSchemes {
+			if strings.HasPrefix(lowered, scheme) {
+				return false
+			}
+		}
+	}
+	if item.EventType != "" && !validEventTypes[item.EventType] {
+		return false
+	}
+	if item.CountryCode != "" && !countryCodeRe.MatchString(item.CountryCode) {
+		return false
+	}
+	return true
+}
+
 func hashText(value string) string {
 	sum := sha1.Sum([]byte(value))
 	return hex.EncodeToString(sum[:])
@@ -186,7 +252,7 @@ func normalizeIngestItem(item ingestItem) (*normalizedIncident, bool) {
 	}
 
 	confidence := item.Confidence
-	if confidence <= 0 || confidence > 1 {
+	if math.IsNaN(confidence) || math.IsInf(confidence, 0) || confidence <= 0 || confidence > 1 {
 		confidence = 0.5
 	}
 	status := "unverified"

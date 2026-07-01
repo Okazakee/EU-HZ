@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -17,6 +18,7 @@ type config struct {
 	ingestFailureThreshold int
 	ingestFailureCooldown  time.Duration
 	corsOrigins            []string
+	trustedProxyNetworks   []*net.IPNet
 }
 
 func loadConfig() config {
@@ -25,7 +27,7 @@ func loadConfig() config {
 	if timeout > interval {
 		timeout = interval
 	}
-	return config{
+	cfg := config{
 		databaseURL:            envOr("DATABASE_URL", "postgres://heatmap:heatmap@localhost:5432/heatmap?sslmode=disable"),
 		port:                   envOr("PORT", "8080"),
 		ingestKey:              envOr("INGEST_KEY", ""),
@@ -36,6 +38,14 @@ func loadConfig() config {
 		ingestFailureCooldown:  durationEnvOr("INGEST_FAILURE_COOLDOWN", time.Hour),
 		corsOrigins:            normalizeOrigins(splitCSV(envOr("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"))),
 	}
+	for _, cidrStr := range splitCSV(envOr("TRUSTED_PROXY_CIDRS", "")) {
+		_, cidr, err := net.ParseCIDR(cidrStr)
+		if err != nil {
+			continue
+		}
+		cfg.trustedProxyNetworks = append(cfg.trustedProxyNetworks, cidr)
+	}
+	return cfg
 }
 
 func envOr(key, fallback string) string {

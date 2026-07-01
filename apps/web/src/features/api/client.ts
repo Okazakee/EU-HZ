@@ -9,6 +9,7 @@ export type DevFailMode = "off" | "500" | "network" | "503";
 export let devFailNext: DevFailMode = "off";
 
 export function armDevFail(mode: DevFailMode) {
+  if (process.env.NODE_ENV === "production") return;
   devFailNext = mode;
 }
 

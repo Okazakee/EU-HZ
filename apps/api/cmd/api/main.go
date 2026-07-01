@@ -2,20 +2,25 @@ package main
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/time/rate"
 )
 
@@ -202,11 +207,12 @@ func sleepContext(ctx context.Context, delay time.Duration) error {
 }
 
 func serve(cfg config, db *store) {
+	trustedProxyNetworks = cfg.trustedProxyNetworks
 	mux := http.NewServeMux()
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/health", withSecurityHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
-	})
-	mux.Handle("/v1/heat", withCORS(cfg, rateLimit("heat", 0.5, 12, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	})))
+	mux.Handle("/v1/heat", withCORS(cfg, rateLimit("heat", 0.5, 12, withSecurityHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		params := readFilters(r.URL.Query())
 		cells, err := db.heat(r.Context(), params)
 		if err != nil {
@@ -216,8 +222,8 @@ func serve(cfg config, db *store) {
 		writeJSON(w, http.StatusOK, heatResponse{
 			Cells: cells,
 		})
-	}))))
-	mux.Handle("/v1/reports", withCORS(cfg, rateLimit("reports", 0.5, 12, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	})))))
+	mux.Handle("/v1/reports", withCORS(cfg, rateLimit("reports", 0.5, 12, withSecurityHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		params := readFilters(r.URL.Query())
 		reports, nextCursor, err := db.reports(r.Context(), params)
 		if err != nil {
@@ -228,26 +234,30 @@ func serve(cfg config, db *store) {
 			Reports:    reports,
 			NextCursor: nextCursor,
 		})
-	}))))
-	mux.Handle("/v1/places", withCORS(cfg, rateLimit("places", 0.2, 4, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	})))))
+	mux.Handle("/v1/places", withCORS(cfg, rateLimit("places", 0.2, 4, withSecurityHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := strings.TrimSpace(r.URL.Query().Get("q"))
 		if len(query) > 80 {
 			query = query[:80]
 		}
 		writeJSON(w, http.StatusOK, placesResponse{Places: searchPlaces(query)})
-	}))))
-	mux.Handle("/v1/sources", withCORS(cfg, rateLimit("sources", 0.2, 4, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	})))))
+	mux.Handle("/v1/sources", withCORS(cfg, rateLimit("sources", 0.2, 4, withSecurityHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sources, err := db.sources(r.Context())
 		if err != nil {
 			writeError(w, err)
 			return
 		}
 		writeJSON(w, http.StatusOK, sourcesResponse{Sources: sources})
-	}))))
-	mux.Handle("/v1/incidents/", withCORS(cfg, rateLimit("incidents", 0.33, 8, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	})))))
+	mux.Handle("/v1/incidents/", withCORS(cfg, rateLimit("incidents", 0.33, 8, withSecurityHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		publicID := strings.TrimPrefix(r.URL.Path, "/v1/incidents/")
 		if publicID == "" {
 			http.NotFound(w, r)
+			return
+		}
+		if !uuidLike.MatchString(publicID) {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid incident id"})
 			return
 		}
 		detail, err := db.incident(r.Context(), publicID)
@@ -256,7 +266,7 @@ func serve(cfg config, db *store) {
 			return
 		}
 		writeJSON(w, http.StatusOK, detail)
-	}))))
+	})))))
 	mux.Handle("/v1/ingest/filter", withIngestKey(cfg, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method not allowed"})
@@ -268,9 +278,15 @@ func serve(cfg config, db *store) {
 			return
 		}
 		items := dedupeIngestItems(req.Items)
+		validated := make([]ingestItem, 0, len(items))
+		for _, item := range items {
+			if validateIngestItem(item) {
+				validated = append(validated, item)
+			}
+		}
 		writeJSON(w, http.StatusOK, ingestFilterResponse{
-			Items:   items,
-			Removed: len(req.Items) - len(items),
+			Items:   validated,
+			Removed: len(req.Items) - len(validated),
 		})
 	})))
 	mux.Handle("/v1/ingest", withIngestKey(cfg, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -285,9 +301,17 @@ func serve(cfg config, db *store) {
 		}
 
 		items := dedupeIngestItems(req.Items)
+		if len(items) > maxItemsPerBatch {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "too many items"})
+			return
+		}
 		result := ingestResponse{Errors: []string{}}
 		result.Skipped = len(req.Items) - len(items)
 		for _, item := range items {
+			if !validateIngestItem(item) {
+				result.Rejected++
+				continue
+			}
 			source, err := db.sourceByHandle(r.Context(), strings.TrimPrefix(item.XHandle, "@"))
 			if err != nil {
 				result.Skipped++
@@ -337,9 +361,12 @@ func serve(cfg config, db *store) {
 }
 
 func decodeIngestRequest(body io.Reader) (ingestRequest, error) {
-	raw, err := io.ReadAll(body)
+	raw, err := io.ReadAll(io.LimitReader(body, maxIngestBodyBytes))
 	if err != nil {
 		return ingestRequest{}, err
+	}
+	if len(raw) >= maxIngestBodyBytes {
+		return ingestRequest{}, errors.New("request body too large")
 	}
 	var req ingestRequest
 	if err := json.Unmarshal(raw, &req); err != nil {
@@ -354,7 +381,7 @@ func withIngestKey(cfg config, next http.Handler) http.Handler {
 			writeJSON(w, http.StatusServiceUnavailable, map[string]string{"error": "ingest not configured"})
 			return
 		}
-		if r.Header.Get("X-Ingest-Key") != cfg.ingestKey {
+		if subtle.ConstantTimeCompare([]byte(r.Header.Get("X-Ingest-Key")), []byte(cfg.ingestKey)) != 1 {
 			writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "unauthorized"})
 			return
 		}
@@ -371,11 +398,20 @@ func writeJSON(w http.ResponseWriter, status int, value any) {
 }
 
 func writeError(w http.ResponseWriter, err error) {
-	status := http.StatusInternalServerError
 	if errors.Is(err, context.Canceled) {
-		status = http.StatusRequestTimeout
+		writeJSON(w, http.StatusRequestTimeout, map[string]string{"error": "request cancelled"})
+		return
 	}
-	writeJSON(w, status, map[string]string{"error": err.Error()})
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid request"})
+		return
+	}
+	if errors.Is(err, pgx.ErrNoRows) {
+		http.NotFound(w, nil)
+		return
+	}
+	writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "internal server error"})
 }
 
 func withCORS(cfg config, next http.Handler) http.Handler {
@@ -424,6 +460,10 @@ var (
 	limiterMu    sync.Mutex
 	limiterStore = map[string]*limiterEntry{}
 )
+
+const maxIngestBodyBytes = 1 << 20
+
+var trustedProxyNetworks []*net.IPNet
 
 func rateLimit(bucket string, requestsPerSecond float64, burst int, next http.Handler) http.Handler {
 	cfg := rateLimitConfig{
@@ -480,12 +520,30 @@ func maxInt(a, b int) int {
 	return b
 }
 
+var uuidLike = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
+
+func withSecurityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func clientIP(r *http.Request) string {
-	if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
-		return strings.TrimSpace(strings.Split(forwarded, ",")[0])
+	remoteHost, _, _ := net.SplitHostPort(r.RemoteAddr)
+	for _, cidr := range trustedProxyNetworks {
+		if cidr.Contains(net.ParseIP(remoteHost)) {
+			if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
+				return strings.TrimSpace(strings.Split(forwarded, ",")[0])
+			}
+			break
+		}
 	}
-	if host, _, found := strings.Cut(r.RemoteAddr, ":"); found {
-		return host
+	if remoteHost != "" {
+		return remoteHost
 	}
 	return r.RemoteAddr
 }
