@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useSyncExternalStore, useTransition } from "react";
 
 import { useHeatQuery, useReportsQuery } from "@/features/api/queries";
 import type { PlaceItem, ViewportBounds } from "@/features/api/types";
@@ -27,6 +27,8 @@ const defaultBounds: ViewportBounds = {
   zoom: 4.2,
 };
 
+const emptySubscribe = () => () => {};
+
 export default function Home() {
   const [isNavigating, startTransition] = useTransition();
   const [bounds, setBounds] = useState(defaultBounds);
@@ -37,15 +39,17 @@ export default function Home() {
     bounds?: [number, number, number, number];
   } | null>(null);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
-  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
+  const [onboardingOverride, setOnboardingOverride] = useState<boolean | null>(null);
   const [devOpen, setDevOpen] = useState(false);
   const [reportsCollapsed, setReportsCollapsed] = useState(false);
 
-  useEffect(() => {
-    setOnboardingComplete(window.localStorage.getItem("hz-onboarding-complete") === "1");
-  }, []);
-
-  const hydrated = onboardingComplete !== null;
+  const persistedOnboardingComplete = useSyncExternalStore(
+    emptySubscribe,
+    () => window.localStorage.getItem("hz-onboarding-complete") === "1",
+    () => true,
+  );
+  const onboardingComplete = onboardingOverride ?? persistedOnboardingComplete;
+  const hydrated = true;
   const onboardingOpen = onboardingComplete === false;
   const queriesEnabled = hydrated && !onboardingOpen;
   const heatQuery = useHeatQuery(bounds, queriesEnabled);
@@ -142,7 +146,7 @@ export default function Home() {
             <PrimaryButton
               onClick={() => {
                 window.localStorage.setItem("hz-onboarding-complete", "1");
-                setOnboardingComplete(true);
+                setOnboardingOverride(true);
               }}
             >
               Enter map
@@ -172,7 +176,7 @@ export default function Home() {
           onClose={() => setDevOpen(false)}
           onShowOnboarding={() => {
             window.localStorage.removeItem("hz-onboarding-complete");
-            setOnboardingComplete(false);
+            setOnboardingOverride(false);
           }}
         />
       ) : null}
