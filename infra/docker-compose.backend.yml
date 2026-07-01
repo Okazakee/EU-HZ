@@ -18,12 +18,13 @@ services:
     build:
       context: ..
       dockerfile: apps/api/Dockerfile
-    network_mode: host
     command: ["/bin/sh", "-lc", "./eu-hz-api migrate-up && ./eu-hz-api serve"]
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "8080:8080"
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgres://heatmap:heatmap@postgres:5432/heatmap?sslmode=disable}
       PORT: ${PORT:-8080}
