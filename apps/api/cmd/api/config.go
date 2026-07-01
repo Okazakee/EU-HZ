@@ -11,6 +11,9 @@ import (
 type config struct {
 	databaseURL            string
 	port                   string
+	appEnv                 string
+	logLevel               string
+	requestTimeout         time.Duration
 	ingestKey              string
 	ingestModel            string
 	ingestInterval         time.Duration
@@ -30,6 +33,9 @@ func loadConfig() config {
 	cfg := config{
 		databaseURL:            envOr("DATABASE_URL", "postgres://heatmap:heatmap@localhost:5432/heatmap?sslmode=disable"),
 		port:                   envOr("PORT", "8080"),
+		appEnv:                 envOr("APP_ENV", "development"),
+		logLevel:               envOr("LOG_LEVEL", "info"),
+		requestTimeout:         durationEnvOr("API_REQUEST_TIMEOUT", 30*time.Second),
 		ingestKey:              envOr("INGEST_KEY", ""),
 		ingestModel:            envOr("INGEST_MODEL", "opencode/deepseek-v4-flash-free"),
 		ingestInterval:         interval,
