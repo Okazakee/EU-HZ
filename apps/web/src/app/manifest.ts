@@ -18,8 +18,13 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       },
       {
-        src: "/euhz.png",
-        sizes: "1024x1024",
+        src: "/euhz-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        src: "/euhz-512.png",
+        sizes: "512x512",
         type: "image/png",
       },
     ],

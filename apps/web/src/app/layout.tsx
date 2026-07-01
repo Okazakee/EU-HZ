@@ -8,18 +8,21 @@ const headingSans = Rajdhani({
   variable: "--font-heading-sans",
   subsets: ["latin"],
   weight: ["500", "600", "700"],
+  display: "optional",
 });
 
 const bodySans = Inter({
   variable: "--font-body-sans",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "optional",
 });
 
 const mono = Space_Mono({
   variable: "--font-body-mono",
   subsets: ["latin"],
   weight: ["400", "700"],
+  display: "optional",
 });
 
 export const metadata: Metadata = {

@@ -1,14 +1,13 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore, useTransition } from "react";
 
 import { useHeatQuery, useReportsQuery } from "@/features/api/queries";
 import type { PlaceItem, ViewportBounds } from "@/features/api/types";
-import { MapShell } from "@/features/map/map-shell";
 import { SearchBar } from "@/features/map/search-bar";
-import { IncidentModal } from "@/features/reports/incident-modal";
 import { ReportsPanel } from "@/features/reports/reports-panel";
 import { ModalShell } from "@/features/ui/modal-shell";
 import { BrandMark } from "@/features/ui/brand-mark";
@@ -19,6 +18,16 @@ import { SiteFooter } from "@/features/ui/site-footer";
 import { appName, onboardingPoints } from "@/features/ui/site-content";
 
 const isDev = process.env.NODE_ENV !== "production";
+
+const MapShell = dynamic(() => import("@/features/map/map-shell").then((mod) => mod.MapShell), {
+  ssr: false,
+  loading: () => <StaticMapBackdrop />,
+});
+
+const IncidentModal = dynamic(
+  () => import("@/features/reports/incident-modal").then((mod) => mod.IncidentModal),
+  { ssr: false },
+);
 
 const defaultBounds: ViewportBounds = {
   west: -10,
@@ -94,14 +103,18 @@ export function HomeClient({ initialOnboardingComplete }: HomeClientProps) {
 
   return (
     <main className="relative h-dvh overflow-hidden bg-[#05060a] text-slate-100">
-      <MapShell
-        cells={heatQuery.data?.cells ?? []}
-        selectedCellId={selectedCellId}
-        focusTarget={focusTarget}
-        onViewportIdle={setBounds}
-      />
+      {queriesEnabled ? (
+        <MapShell
+          cells={heatQuery.data?.cells ?? []}
+          selectedCellId={selectedCellId}
+          focusTarget={focusTarget}
+          onViewportIdle={setBounds}
+        />
+      ) : (
+        <StaticMapBackdrop />
+      )}
 
-      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_top_left,rgba(245,208,0,0.144),transparent_28%),radial-gradient(circle_at_top_right,rgba(95,232,255,0.112),transparent_32%),linear-gradient(180deg,rgba(5,6,10,0.12),rgba(5,6,10,0.34))]" />
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_top_left,rgba(245,208,0,0.144),transparent_28%),radial-gradient(circle_at_top_right,rgba(95,232,255,0.112),transparent_32%),linear-gradient(180deg,rgba(10,16,24,0.04),rgba(10,16,24,0.16))]" />
 
       <div className="pointer-events-none absolute left-0 right-0 top-0 z-20 p-3 md:p-5">
         <div className="pointer-events-auto flex w-full items-center gap-2 md:max-w-[520px] md:gap-3">
@@ -142,11 +155,13 @@ export function HomeClient({ initialOnboardingComplete }: HomeClientProps) {
         </div>
       </div>
 
-      <IncidentModal
-        open={Boolean(selectedReportId)}
-        publicId={selectedReportId}
-        onClose={() => setSelectedReportId(null)}
-      />
+      {selectedReportId ? (
+        <IncidentModal
+          open
+          publicId={selectedReportId}
+          onClose={() => setSelectedReportId(null)}
+        />
+      ) : null}
 
       <ModalShell
         open={onboardingOpen}
@@ -174,6 +189,7 @@ export function HomeClient({ initialOnboardingComplete }: HomeClientProps) {
               alt={appName}
               width={112}
               height={112}
+              preload
               className="h-28 w-28 shrink-0 drop-shadow-[0_0_18px_rgba(245,208,0,0.4)]"
             />
           </div>
@@ -208,5 +224,14 @@ export function HomeClient({ initialOnboardingComplete }: HomeClientProps) {
         ]}
       />
     </main>
+  );
+}
+
+function StaticMapBackdrop() {
+  return (
+    <div className="relative h-dvh w-screen overflow-hidden bg-[#121923]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_36%,rgba(95,232,255,0.16),transparent_34%),radial-gradient(circle_at_24%_24%,rgba(245,208,0,0.18),transparent_28%),linear-gradient(135deg,#121923,#1c2633_54%,#141c27)]" />
+      <div className="cyber-map-overlay pointer-events-none absolute inset-0 z-[1]" />
+    </div>
   );
 }

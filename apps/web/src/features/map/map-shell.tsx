@@ -1,5 +1,7 @@
 "use client";
 
+import "maplibre-gl/dist/maplibre-gl.css";
+
 import maplibregl, { LngLatBoundsLike, Map } from "maplibre-gl";
 import { useEffect, useRef } from "react";
 
@@ -342,24 +344,24 @@ function applyCyberTheme(map: Map) {
     }
   };
 
-  setPaint("background", { "background-color": "#08090f" });
+  setPaint("background", { "background-color": "#16202a" });
 
   setPaint("water", {
-    "fill-color": "#0a1320",
-    "fill-outline-color": "rgba(95,232,255,0.22)",
+    "fill-color": "#183447",
+    "fill-outline-color": "rgba(95,232,255,0.28)",
   });
   setPaint("water_shadow", {
-    "fill-color": "#0c1626",
+    "fill-color": "#214156",
   });
 
-  setPaint("landcover", { "fill-color": "#0c0e16" });
-  setPaint("landuse", { "fill-color": "#0c0e16" });
-  setPaint("landuse_residential", { "fill-color": "#0d0f18" });
-  setPaint("park_national_park", { "fill-color": "#0c1510" });
-  setPaint("park_nature_reserve", { "fill-color": "#0c1510" });
+  setPaint("landcover", { "fill-color": "#1e2430" });
+  setPaint("landuse", { "fill-color": "#202734" });
+  setPaint("landuse_residential", { "fill-color": "#262d3b" });
+  setPaint("park_national_park", { "fill-color": "#22332a" });
+  setPaint("park_nature_reserve", { "fill-color": "#22332a" });
 
-  setPaint("building", { "fill-color": "#0e131c", "fill-outline-color": "rgba(95,232,255,0.1)" });
-  setPaint("building-top", { "fill-color": "#131c2e" });
+  setPaint("building", { "fill-color": "#344253", "fill-outline-color": "rgba(95,232,255,0.14)" });
+  setPaint("building-top", { "fill-color": "#415267" });
 
   for (const id of ["waterway"]) {
     setPaint(id, { "line-color": "rgba(95,232,255,0.22)" });
@@ -391,12 +393,12 @@ function applyCyberTheme(map: Map) {
   }
 
   const roadTints: Record<string, string> = {
-    mot: "rgba(245,208,0,0.72)",
-    trunk: "rgba(255,170,40,0.62)",
-    pri: "rgba(255,160,60,0.5)",
-    sec: "rgba(95,232,255,0.42)",
+    mot: "rgba(245,208,0,0.82)",
+    trunk: "rgba(255,184,72,0.74)",
+    pri: "rgba(255,175,96,0.64)",
+    sec: "rgba(95,232,255,0.54)",
   };
-  const roadDim: Record<string, string> = { road_service: "#0a0f17", road_minor: "#0b0f17", road_path: "#0a0d12" };
+  const roadDim: Record<string, string> = { road_service: "#4c5968", road_minor: "#566374", road_path: "#617081" };
 
   for (const id of map.getStyle().layers.map((l) => l.id)) {
     if (id.startsWith("tunnel") || id.startsWith("bridge")) {
@@ -411,7 +413,7 @@ function applyCyberTheme(map: Map) {
       continue;
     }
     if (id.includes("case")) {
-      setPaint(id, { "line-color": "#05060a" });
+      setPaint(id, { "line-color": "#1a232d" });
       continue;
     }
     const tierKey = Object.keys(roadTints).find((t) => id.includes(`_${t}_`));
@@ -420,7 +422,7 @@ function applyCyberTheme(map: Map) {
       continue;
     }
     const dimKey = Object.keys(roadDim).find((base) => id.startsWith(base));
-    setPaint(id, { "line-color": dimKey ? roadDim[dimKey] : "#0a0f17" });
+    setPaint(id, { "line-color": dimKey ? roadDim[dimKey] : "#566374" });
   }
 
   for (const id of map.getStyle().layers.map((l) => l.id)) {
@@ -429,7 +431,7 @@ function applyCyberTheme(map: Map) {
       continue;
     }
     try {
-      map.setPaintProperty(id, "text-halo-color", "#040508");
+      map.setPaintProperty(id, "text-halo-color", "#1a232d");
       map.setPaintProperty(id, "text-halo-blur", 0);
       map.setPaintProperty(id, "text-halo-width", 1.4);
       if (id.startsWith("water_name") || id.startsWith("waterway_label")) {
