@@ -59,6 +59,9 @@ What matters:
 - `INGEST_KEY`: shared key for protected ingest endpoints
 - `INGEST_MODEL`: default ingest model, currently `opencode/deepseek-v4-flash-free`
 - `INGEST_INTERVAL`: loop cadence for ingest worker mode
+- `INGEST_TIMEOUT`: max wall-clock time for one ingest subprocess run
+- `INGEST_FAILURE_THRESHOLD`: consecutive failures before the loop enters cooldown
+- `INGEST_FAILURE_COOLDOWN`: delay used after repeated ingest failures
 - `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`: backend Docker Compose Postgres config
 - `NEXT_PUBLIC_API_BASE_URL`: frontend API base URL
 

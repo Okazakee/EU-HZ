@@ -9,9 +9,11 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -65,7 +67,8 @@ func main() {
 		mode = os.Args[1]
 	}
 
-	ctx := context.Background()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 	db, err := openStore(ctx, cfg)
 	if err != nil {
 		log.Fatalf("open db: %v", err)
@@ -125,17 +128,39 @@ func aggregateHeat(ctx context.Context, db *store) error {
 // The Go process never calls an LLM or search engine directly — those are
 // blocked from server-side contexts.
 func runIngestOnce(ctx context.Context, cfg config) error {
-	return execIngestCommand(ctx, cfg)
+	err, _, _ := runIngestAttempt(ctx, cfg)
+	return err
 }
 
 func ingestLoop(ctx context.Context, cfg config) {
-	ticker := time.NewTicker(cfg.ingestInterval)
-	defer ticker.Stop()
+	consecutiveFailures := 0
 	for {
-		if err := execIngestCommand(ctx, cfg); err != nil {
-			log.Printf("ingest-loop error: %v", err)
+		err, duration, timedOut := runIngestAttempt(ctx, cfg)
+		delay := cfg.ingestInterval
+		if err != nil {
+			consecutiveFailures++
+			if timedOut {
+				log.Printf("ingest-loop timeout after %s (consecutive_failures=%d)", duration.Round(time.Second), consecutiveFailures)
+			} else {
+				log.Printf("ingest-loop error after %s: %v (consecutive_failures=%d)", duration.Round(time.Second), err, consecutiveFailures)
+			}
+			if consecutiveFailures >= cfg.ingestFailureThreshold {
+				delay = cfg.ingestFailureCooldown
+				log.Printf("ingest-loop cooldown for %s after %d consecutive failures", delay, consecutiveFailures)
+			}
+		} else {
+			if consecutiveFailures > 0 {
+				log.Printf("ingest-loop recovered after %d consecutive failures", consecutiveFailures)
+			}
+			consecutiveFailures = 0
+			log.Printf("ingest-loop success in %s; next run in %s", duration.Round(time.Second), delay)
 		}
-		<-ticker.C
+		if err := sleepContext(ctx, delay); err != nil {
+			if !errors.Is(err, context.Canceled) {
+				log.Printf("ingest-loop sleep interrupted: %v", err)
+			}
+			return
+		}
 	}
 }
 
@@ -149,6 +174,31 @@ func execIngestCommand(ctx context.Context, cfg config) error {
 	)
 	log.Printf("ingest: launching opencode run --model %s --command x-ingest", cfg.ingestModel)
 	return cmd.Run()
+}
+
+func runIngestAttempt(ctx context.Context, cfg config) (error, time.Duration, bool) {
+	runCtx, cancel := context.WithTimeout(ctx, cfg.ingestTimeout)
+	defer cancel()
+
+	start := time.Now()
+	err := execIngestCommand(runCtx, cfg)
+	duration := time.Since(start)
+	timedOut := errors.Is(runCtx.Err(), context.DeadlineExceeded)
+	if timedOut {
+		return context.DeadlineExceeded, duration, true
+	}
+	return err, duration, false
+}
+
+func sleepContext(ctx context.Context, delay time.Duration) error {
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
 }
 
 func serve(cfg config, db *store) {

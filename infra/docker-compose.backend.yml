@@ -29,6 +29,10 @@ services:
       PORT: ${PORT:-8080}
       INGEST_KEY: ${INGEST_KEY:-change-me}
       INGEST_MODEL: ${INGEST_MODEL:-opencode/deepseek-v4-flash-free}
+      INGEST_INTERVAL: ${INGEST_INTERVAL:-24h}
+      INGEST_TIMEOUT: ${INGEST_TIMEOUT:-15m}
+      INGEST_FAILURE_THRESHOLD: ${INGEST_FAILURE_THRESHOLD:-3}
+      INGEST_FAILURE_COOLDOWN: ${INGEST_FAILURE_COOLDOWN:-1h}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
 volumes:
   postgres_data:

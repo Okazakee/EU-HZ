@@ -4,12 +4,14 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 import { getHeat, getIncident, getPlaces, getReports } from "./client";
 import type { ViewportBounds } from "./types";
-import { buildSearchParams, zoomBucket } from "../map/query-key";
+import { bboxParam, buildSearchParams, zoomBucket } from "../map/query-key";
 
 export function useHeatQuery(bounds: ViewportBounds, enabled = true) {
   const search = buildSearchParams(bounds);
+  const bbox = bboxParam(bounds);
+  const zBucket = zoomBucket(bounds.zoom);
   return useQuery({
-    queryKey: ["heat", zoomBucket(bounds.zoom), bounds.west, bounds.south, bounds.east, bounds.north],
+    queryKey: ["heat", zBucket, bbox],
     queryFn: () => getHeat(search),
     enabled,
     placeholderData: (previousData) => previousData,
@@ -18,8 +20,10 @@ export function useHeatQuery(bounds: ViewportBounds, enabled = true) {
 
 export function useReportsQuery(bounds: ViewportBounds, enabled = true) {
   const baseSearch = buildSearchParams(bounds);
+  const bbox = bboxParam(bounds);
+  const zBucket = zoomBucket(bounds.zoom);
   return useInfiniteQuery({
-    queryKey: ["reportsInfinite", zoomBucket(bounds.zoom), bounds.west, bounds.south, bounds.east, bounds.north],
+    queryKey: ["reportsInfinite", zBucket, bbox],
     queryFn: ({ pageParam }) => {
       const params = new URLSearchParams(baseSearch);
       params.set("limit", "20");
