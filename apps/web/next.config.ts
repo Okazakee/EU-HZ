@@ -2,11 +2,11 @@ import type { NextConfig } from "next";
 
 const csp = [
   "default-src 'self'",
-  "connect-src 'self' https://euhzbe.okazakee.dev https://basemaps.cartocdn.com https://tiles.basemaps.cartocdn.com",
+  "connect-src 'self' https://euhzbe.okazakee.dev https://basemaps.cartocdn.com https://tiles.basemaps.cartocdn.com https://tiles-a.basemaps.cartocdn.com https://tiles-b.basemaps.cartocdn.com https://tiles-c.basemaps.cartocdn.com https://tiles-d.basemaps.cartocdn.com",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://basemaps.cartocdn.com https://tiles.basemaps.cartocdn.com",
-  "font-src 'self' https://tiles.basemaps.cartocdn.com",
+  "img-src 'self' data: https://basemaps.cartocdn.com https://tiles.basemaps.cartocdn.com https://tiles-a.basemaps.cartocdn.com https://tiles-b.basemaps.cartocdn.com https://tiles-c.basemaps.cartocdn.com https://tiles-d.basemaps.cartocdn.com",
+  "font-src 'self' https://tiles.basemaps.cartocdn.com https://tiles-a.basemaps.cartocdn.com https://tiles-b.basemaps.cartocdn.com https://tiles-c.basemaps.cartocdn.com https://tiles-d.basemaps.cartocdn.com",
   "worker-src 'self' blob:",
   "frame-src 'none'",
 ].join("; ");
