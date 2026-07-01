@@ -12,8 +12,6 @@ RUN cd apps/api && CGO_ENABLED=0 GOOS=linux go build -o /out/eu-hz-api ./cmd/api
 
 FROM alpine:3.22
 
-RUN apk add --no-cache ca-certificates tzdata
-
 WORKDIR /app/apps/api
 
 COPY --from=build /out/eu-hz-api ./eu-hz-api
